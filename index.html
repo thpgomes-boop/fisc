@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SGFisc • 66º BI Mtz</title>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --card-hover: #334155;
+      --text: #f8fafc; --muted: #94a3b8; --border: #334155;
+      --primary: #10b981; --danger: #ef4444; --warning: #f59e0b; --info: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+    
+    /* Header Mobile-First */
+    header { background: #020617; padding: 14px 16px; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .brand h1 { font-size: 16px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; }
+    .brand span { font-size: 11px; color: var(--muted); display: block; }
+    .btn-mode { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-mode.unlocked { background: rgba(16, 185, 129, 0.2); border-color: var(--primary); color: var(--primary); }
+
+    /* Tour Interativo */
+    .tour-banner { background: linear-gradient(135deg, #1d4ed8, #1e40af); margin: 12px; padding: 14px; border-radius: 12px; border: 1px solid #60a5fa; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .tour-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #93c5fd; }
+    .tour-text { font-size: 13px; line-height: 1.45; margin-bottom: 12px; }
+    .tour-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-tour { background: #fff; color: #1e3a8a; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .btn-tour-sec { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+    /* KPIs */
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; }
+    .kpi { background: var(--card); padding: 12px; border-radius: 10px; border-left: 4px solid var(--info); }
+    .kpi.danger { border-left-color: var(--danger); }
+    .kpi.warning { border-left-color: var(--warning); }
+    .kpi.success { border-left-color: var(--primary); }
+    .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+    .kpi-val { font-size: 18px; font-weight: 800; margin-top: 4px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; padding: 0 12px 12px; overflow-x: auto; }
+    .tab { background: var(--card); color: var(--muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+    .tab.active { background: var(--primary); color: #020617; border-color: var(--primary); }
+
+    /* Cards de Processo */
+    .list { padding: 0 12px; display: flex; flex-direction: column; gap: 10px; }
+    .card { background: var(--card); border-radius: 12px; padding: 14px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+    .card:active { transform: scale(0.98); }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+    .bg-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--danger); }
+    .bg-warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid var(--warning); }
+    .bg-ok { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--primary); }
+    .card-title { font-size: 14px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+    .card-sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    
+    /* Mini Stepper */
+    .progress-bar { height: 6px; background: #0f172a; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+    .progress-fill { height: 100%; background: var(--primary); }
+    .card-foot { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+
+    /* Modal Detalhes */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; overflow-y: auto; padding: 16px; }
+    .modal.open { display: block; }
+    .modal-box { background: var(--card); border-radius: 14px; padding: 16px; max-width: 600px; margin: 0 auto; border: 1px solid var(--border); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; }
+    .close-btn { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; }
+    
+    /* Timeline 8 Etapas */
+    .step-item { display: flex; gap: 10px; padding: 8px 0; border-left: 2px solid var(--border); margin-left: 8px; padding-left: 14px; position: relative; }
+    .step-item::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--border); position: absolute; left: -6px; top: 12px; }
+    .step-item.done { border-left-color: var(--primary); }
+    .step-item.done::before { background: var(--primary); }
+    .step-item.current::before { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+    .step-title { font-size: 13px; font-weight: 600; }
+    .step-desc { font-size: 11px; color: var(--muted); }
+
+    /* Seções internas do Modal */
+    .sec-box { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 12px; }
+    .sec-box h4 { color: var(--primary); margin-bottom: 6px; font-size: 12px; text-transform: uppercase; }
+    .log-entry { border-bottom: 1px solid var(--border); padding: 6px 0; }
+    .log-entry:last-child { border-bottom: none; }
+    
+    input, select, textarea { width: 100%; background: #1e293b; border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 6px; margin-top: 6px; font-size: 13px; }
+    .btn-primary { width: 100%; background: var(--primary); color: #020617; font-weight: 700; border: none; padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>SGFisc • 66º BI Mtz</h1>
+    <span>Fiscalização Administrativa • UG 160155</span>
+  </div>
+  <button id="btnMode" class="btn-mode" onclick="alternarModo()">👁️ Visão Cmt (PIN)</button>
+</header>
+
+<!-- Tutorial Interativo -->
+<div id="tourBox" class="tour-banner">
+  <div class="tour-header">
+    <span id="tourStepLabel">Tutorial Guiado • Passo 1 de 4</span>
+    <button class="btn-tour-sec" onclick="fecharTour()">Pular ✕</button>
+  </div>
+  <div id="tourText" class="tour-text">
+    Bem-vindo ao SGFisc! Este painel mostra ao Comandante em tempo real os gargalos da RPCM: empenhos atrasados, processos sancionadores (PAS) e saldo das Notas de Crédito.
+  </div>
+  <div class="tour-actions">
+    <button class="btn-tour" onclick="proximoPassoTour()">Próximo Passo ➔</button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+  <div class="kpi danger">
+    <div class="kpi-label">Críticos / PAS</div>
+    <div class="kpi-val" id="kpiCriticos">2</div>
+  </div>
+  <div class="kpi warning">
+    <div class="kpi-label">Aguard. Entrega</div>
+    <div class="kpi-val" id="kpiEntrega">R$ 41.805</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">A Comprar (SALC)</div>
+    <div class="kpi-val" id="kpiSalc">R$ 85.000</div>
+  </div>
+  <div class="kpi success">
+    <div class="kpi-label">Saldo Livre NCs</div>
+    <div class="kpi-val" id="kpiNc">R$ 79.631</div>
+  </div>
+</div>
+
+<!-- Navegação -->
+<div class="tabs">
+  <button class="tab active" onclick="mudarAba('criticos', this)">🚨 Ação Imediata</button>
+  <button class="tab" onclick="mudarAba('todos', this)">📋 Todos os Processos</button>
+  <button class="tab" onclick="mudarAba('ncs', this)">💳 Notas de Crédito (RPCM)</button>
+  <button class="tab" onclick="mudarAba('config', this)">⚙️ Conectar Planilha</button>
+</div>
+
+<!-- Conteúdo Principal -->
+<div id="mainContent" class="list"></div>
+
+<!-- Modal Mapa do Processo -->
+<div id="modalProc" class="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <strong id="mTitle" style="font-size:15px;">Detalhes do Processo</strong>
+      <button class="close-btn" onclick="fecharModal()">✕</button>
+    </div>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script>
+  const ETAPAS = [
+    "1. Demanda / DFD (Requisitante)",
+    "2. Análise Crédito e Despacho OD",
+    "3. Licitação / Pregão / Dispensa (SALC)",
+    "4. Emissão de Nota de Empenho (NE)",
+    "5. Aguardando Entrega do Fornecedor",
+    "6. Recebimento Almox / Aprov / CREM",
+    "7. Liquidação Tesouraria / Conformidade",
+    "8. Ordem Bancária / Pago"
+  ];
+
+  let modoFiscal = false;
+  let abaAtual = 'criticos';
+  let passoTour = 0;
+
+  const TOUR_PASSOS = [
+    "Passo 1/4: No topo você tem os indicadores imediatos para responder perguntas da RPCM. Note os casos reais da OM (Mecatron, IBBA e Peças PMT) já carregados.",
+    "Passo 2/4: Toque em qualquer card abaixo para abrir o Mapa do Processo de 8 Etapas, ver o código de rastreio e o histórico de cobranças para Processo Sancionador (PAS).",
+    "Passo 3/4: Clique na aba 'Notas de Crédito (RPCM)' para ver exatamente o que já foi comprado em cada NC e quanto sobra livre para não devolver crédito.",
+    "Passo 4/4: Para testar a edição, toque em 'Visão Cmt (PIN)' no topo direito e digite 1234. Isso libera o registro de cobranças e avanço de etapas."
+  ];
+
+  // Dados reais extraídos das planilhas da OM para demonstração
+  let processos = [
+    {
+      ID: 'PROC-01', Prioridade: 'Alta', Objeto: 'Manutenção de Bens Móveis (2025NE000336)',
+      Setor_Req: 'PMT', Resp_Atual: 'SALC / Fisc Adm', NC_Vinculada: '2025NC001240',
+      Valor: 5033.75, NE: '2025NE000336', Fornecedor: 'MECATRON TECNOLOGIA E SERVICOS LTDA',
+      Contato: '(65) 99912-3456', Rastreio: 'Aguardando Declaração de Incapacidade',
+      Etapa_Atual: 5, Data_Limite: '2026-01-22', Status_Risco: 'PAS Aberto',
+      Itens: 'Manutenção de equipamentos eletrônicos/viaturas (RPNP 328 dias)',
+      Contatos_JSON: '[{"data":"10/04/2026","meio":"E-mail/Ofício","resp":"PMT","resumo":"Empresa alegou não ter capacidade de executar. Aguardando envio formal para anulação da NE."}]',
+      PAS_Status: 'Abertura de PAS Solicitada'
+    },
+    {
+      ID: 'PROC-02', Prioridade: 'Alta', Objeto: 'Aquisição de Bebedouros (2025NE000473)',
+      Setor_Req: 'ALMOX', Resp_Atual: 'SALC / Fisc Adm', NC_Vinculada: '2025NC001890',
+      Valor: 5100.00, NE: '2025NE000473', Fornecedor: 'IBBA INDUSTRIA DE BEBEDOUROS LTDA',
+      Contato: '(11) 3344-5566', Rastreio: 'Sem envio - Empresa silente',
+      Etapa_Atual: 5, Data_Limite: '2025-11-20', Status_Risco: 'PAS Aberto',
+      Itens: '03 Bebedouros Industriais Inox (RPNP 274 dias)',
+      Contatos_JSON: '[{"data":"15/02/2026","meio":"WhatsApp","resp":"ALMOX","resumo":"Empresa parou de responder mensagens."},{"data":"05/05/2026","meio":"DIEx","resp":"Fisc Adm","resumo":"Encaminhado DIEx para abertura de Processo Administrativo Sancionador."}]',
+      PAS_Status: 'DIEx de Abertura Enviado'
+    },
+    {
+      ID: 'PROC-03', Prioridade: 'Normal', Objeto: 'Peças Manutenção Viaturas (2026NE000169)',
+      Setor_Req: 'PMT', Resp_Atual: 'PMT', NC_Vinculada: '2026NC000412',
+      Valor: 31671.96, NE: '2026NE000169', Fornecedor: 'S. A & CO LTDA',
+      Contato: '(65) 98877-6655', Rastreio: 'BR884729102BR (Transportadora)',
+      Etapa_Atual: 5, Data_Limite: '2026-05-14', Status_Risco: 'Avisou Atraso',
+      Itens: 'Kit embreagem, pastilhas e filtros para viaturas operacionais',
+      Contatos_JSON: '[{"data":"12/05/2026","meio":"Telefone","resp":"PMT","resumo":"Empresa alegou indisponibilidade na fábrica, enviou rastreio parcial."}]',
+      PAS_Status: 'Notificação Prévia Enviada'
+    },
+    {
+      ID: 'PROC-04', Prioridade: 'Normal', Objeto: 'Gêneros Alimentícios QR (2026NE000049)',
+      Setor_Req: 'APROV', Resp_Atual: 'APROV', NC_Vinculada: '2026NC000110',
+      Valor: 3920.50, NE: '2026NE000049', Fornecedor: 'BIDDING COMERCIO E SERVICOS LTDA',
+      Contato: '(65) 3223-1100', Rastreio: 'Entrega Fracionada Programada',
+      Etapa_Atual: 6, Data_Limite: '2026-11-25', Status_Risco: 'Normal',
+      Itens: 'Gêneros estocáveis conforme capacidade da câmara fria',
+      Contatos_JSON: '[]', PAS_Status: 'Sem PAS'
+    },
+    {
+      ID: 'PROC-05', Prioridade: 'Alta', Objeto: 'Materiais Mnt Bens Imóveis SINAP',
+      Setor_Req: 'PEL OBRAS', Resp_Atual: 'SALC', NC_Vinculada: '2026NC000890',
+      Valor: 85000.00, NE: 'Em Licitação', Fornecedor: 'Pregão em Elaboração',
+      Contato: '-', Rastreio: '-',
+      Etapa_Atual: 3, Data_Limite: '2026-11-28', Status_Risco: 'Normal',
+      Itens: 'Cimento, tintas, cabos elétricos e conexões hidráulicas',
+      Contatos_JSON: '[]', PAS_Status: 'Sem PAS'
+    }
+  ];
+
+  let ncs = [
+    { NC: '2026NC000412', PI: 'E1DTDEFSARE', ND: '339030', Descricao: 'Manutenção de Viaturas (PMT)', Valor_Total: 120000, Empenhado: 64968.03, Comprometido_SALC: 15000 },
+    { NC: '2026NC000110', PI: 'E6SUPLJA1QR', ND: '339030', Descricao: 'Quantitativo de Rancho (QR)', Valor_Total: 250000, Empenhado: 185400.00, Comprometido_SALC: 35000 },
+    { NC: '2026NC000890', PI: 'E6SUPLJA5PA', ND: '339030', Descricao: 'Manutenção Bens Imóveis (PO)', Valor_Total: 95000, Empenhado: 0, Comprometido_SALC: 85000 }
+  ];
+
+  function proximoPassoTour() {
+    passoTour++;
+    if (passoTour >= TOUR_PASSOS.length) {
+      fecharTour();
+      return;
+    }
+    document.getElementById('tourStepLabel').innerText = `Tutorial Guiado • Passo ${passoTour + 1} de 4`;
+    document.getElementById('tourText').innerText = TOUR_PASSOS[passoTour];
+  }
+
+  function fecharTour() {
+    document.getElementById('tourBox').style.display = 'none';
+  }
+
+  function alternarModo() {
+    if (modoFiscal) {
+      modoFiscal = false;
+      document.getElementById('btnMode').innerText = '👁️ Visão Cmt (PIN)';
+      document.getElementById('btnMode').classList.remove('unlocked');
+      return;
+    }
+    const pin = prompt('Digite o PIN do Fiscal Administrativo (Demo: 1234):');
+    if (pin === '1234') {
+      modoFiscal = true;
+      document.getElementById('btnMode').innerText = '🔓 Modo Fiscal Adm';
+      document.getElementById('btnMode').classList.add('unlocked');
+      alert('Modo Edição liberado! Agora você pode registrar cobranças e avançar etapas ao abrir um processo.');
+    } else if (pin !== null) {
+      alert('PIN incorreto.');
+    }
+  }
+
+  function mudarAba(aba, el) {
+    abaAtual = aba;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderizar();
+  }
+
+  function formatarMoeda(v) {
+    return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function renderizar() {
+    const container = document.getElementById('mainContent');
+    container.innerHTML = '';
+
+    if (abaAtual === 'criticos' || abaAtual === 'todos') {
+      const filtrados = abaAtual === 'criticos'
+        ? processos.filter(p => p.Status_Risco !== 'Normal' || p.Prioridade === 'Alta')
+        : processos;
+
+      filtrados.forEach(p => {
+        const pct = Math.round((p.Etapa_Atual / 8) * 100);
+        const badgeClass = p.Status_Risco === 'PAS Aberto' ? 'bg-danger' : (p.Status_Risco === 'Avisou Atraso' ? 'bg-warning' : 'bg-ok');
+        const contatos = JSON.parse(p.Contatos_JSON || '[]');
+
+        container.innerHTML += `
+          <div class="card" onclick="abrirModal('${p.ID}')">
+            <div class="card-top">
+              <span class="badge ${badgeClass}">${p.Status_Risco}</span>
+              <span style="font-size:11px; color:#94a3b8;">${p.Setor_Req} • ${formatarMoeda(p.Valor)}</span>
+            </div>
+            <div class="card-title">${p.Objeto}</div>
+            <div class="card-sub">🏢 ${p.Fornecedor} | 💳 ${p.NC_Vinculada}</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div class="card-foot">
+              <span>Etapa ${p.Etapa_Atual}/8: ${ETAPAS[p.Etapa_Atual - 1].split('. ')[1]}</span>
+              <span>📞 ${contatos.length} cobr.</span>
+            </div>
+          </div>
+        `;
+      });
+    } else if (abaAtual === 'ncs') {
+      ncs.forEach(nc => {
+        const livre = nc.Valor_Total - nc.Empenhado - nc.Comprometido_SALC;
+        const comprasNc = processos.filter(p => p.NC_Vinculada === nc.NC);
+        container.innerHTML += `
+          <div class="card">
+            <div class="card-top">
+              <span class="badge bg-ok">${nc.NC} • PI ${nc.PI}</span>
+              <span style="font-size:12px; font-weight:700; color:#10b981;">Livre: ${formatarMoeda(livre)}</span>
+            </div>
+            <div class="card-title">${nc.Descricao} (ND ${nc.ND})</div>
+            <div class="card-sub">Total: ${formatarMoeda(nc.Valor_Total)} | Empenhado: ${formatarMoeda(nc.Empenhado)}</div>
+            <div class="sec-box">
+              <h4>O que foi comprado nesta NC:</h4>
+              ${comprasNc.length ? comprasNc.map(c => `<div style="margin-bottom:4px;">• <strong>${c.NE}</strong> (${c.Setor_Req}): ${c.Itens} — <em>${formatarMoeda(c.Valor)}</em></div>`).join('') : 'Nenhum empenho vinculado ainda.'}
+            </div>
+          </div>
+        `;
+      });
+    } else if (abaAtual === 'config') {
+      const urlSalva = localStorage.getItem('sgfisc_api_url') || '';
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-title">🔗 Conectar ao Google Sheets (GAS)</div>
+          <div class="card-sub">Cole abaixo a URL do Web App gerada no Google Apps Script para sincronizar com a planilha real do Batalhão.</div>
+          <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/..." value="${urlSalva}">
+          <button class="btn-primary" onclick="salvarApiUrl()">Salvar e Sincronizar</button>
+        </div>
+      `;
+    }
+  }
+
+  function abrirModal(id) {
+    const p = processos.find(x => x.ID === id);
+    const contatos = JSON.parse(p.Contatos_JSON || '[]');
+    document.getElementById('mTitle').innerText = p.Objeto;
+
+    let stepsHtml = ETAPAS.map((nome, idx) => {
+      const num = idx + 1;
+      const cls = num < p.Etapa_Atual ? 'done' : (num === p.Etapa_Atual ? 'current' : '');
+      return `<div class="step-item ${cls}"><div><div class="step-title">${nome}</div><div class="step-desc">${num === p.Etapa_Atual ? '📍 Etapa Atual • Resp: ' + p.Resp_Atual + ' | Prazo: ' + p.Data_Limite : (num < p.Etapa_Atual ? '✔ Concluído' : 'Aguardando')}</div></div></div>`;
+    }).join('');
+
+    let logsHtml = contatos.length
+      ? contatos.map(c => `<div class="log-entry"><strong>${c.data} (${c.meio} - ${c.resp}):</strong> ${c.resumo}</div>`).join('')
+      : '<div style="color:#94a3b8;">Nenhuma cobrança registrada ainda.</div>';
+
+    let edicaoHtml = modoFiscal ? `
+      <div class="sec-box" style="border:1px solid var(--primary);">
+        <h4>⚡ Ação Rápida do Fiscal Adm</h4>
+        <label>Avançar / Alterar Etapa:</label>
+        <select id="editEtapa">
+          ${ETAPAS.map((e, i) => `<option value="${i+1}" ${p.Etapa_Atual === i+1 ? 'selected' : ''}>${e}</option>`).join('')}
+        </select>
+        <label>Código de Rastreio / Transportadora:</label>
+        <input type="text" id="editRastreio" value="${p.Rastreio}">
+        <label>Registrar Novo Contato / Cobrança:</label>
+        <input type="text" id="novoContatoTexto" placeholder="Ex: Cobrado via WhatsApp, prometeu entregar dia 25...">
+        <button class="btn-primary" onclick="salvarEdicao('${p.ID}')">Salvar Atualização</button>
+      </div>
+    ` : `<div style="margin-top:12px; font-size:11px; color:#94a3b8; text-align:center;">Ative o Modo Fiscal Adm (PIN 1234) no topo para editar etapas ou registrar cobranças.</div>`;
+
+    document.getElementById('mBody').innerHTML = `
+      <div class="sec-box">
+        <h4>📦 Produto, Fornecedor & Rastreio</h4>
+        <div><strong>Empresa:</strong> ${p.Fornecedor} (${p.Contato})</div>
+        <div><strong>Produtos:</strong> ${p.Itens}</div>
+        <div><strong>Rastreio:</strong> <span style="color:#38bdf8;">${p.Rastreio}</span></div>
+        <div><strong>Situação PAS:</strong> <span style="color:#fca5a5;">${p.PAS_Status}</span></div>
+      </div>
+      <div class="sec-box">
+        <h4>🗺️ Mapa do Processo</h4>
+        ${stepsHtml}
+      </div>
+      <div class="sec-box">
+        <h4>📞 Histórico de Contatos (${contatos.length} registros)</h4>
+        ${logsHtml}
+      </div>
+      ${edicaoHtml}
+    `;
+    document.getElementById('modalProc').classList.add('open');
+  }
+
+  function salvarEdicao(id) {
+    const p = processos.find(x => x.ID === id);
+    p.Etapa_Atual = Number(document.getElementById('editEtapa').value);
+    p.Rastreio = document.getElementById('editRastreio').value;
+    const novoTxt = document.getElementById('novoContatoTexto').value.trim();
+    if (novoTxt) {
+      const lista = JSON.parse(p.Contatos_JSON || '[]');
+      const hoje = new Date().toLocaleDateString('pt-BR');
+      lista.push({ data: hoje, meio: 'Registro App', resp: 'Fisc Adm', resumo: novoTxt });
+      p.Contatos_JSON = JSON.stringify(lista);
+    }
+    fecharModal();
+    renderizar();
+    alert('Atualizado com sucesso!');
+  }
+
+  function fecharModal() {
+    document.getElementById('modalProc').classList.remove('open');
+  }
+
+  function salvarApiUrl() {
+    const url = document.getElementById('apiUrlInput').value.trim();
+    localStorage.setItem('sgfisc_api_url', url);
+    alert('URL salva! Quando estiver conectada à planilha, os dados serão sincronizados automaticamente.');
+  }
+
+  renderizar();
+</script>
+</body>
+</html>
